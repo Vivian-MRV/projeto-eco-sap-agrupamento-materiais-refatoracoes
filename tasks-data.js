@@ -1,5 +1,5 @@
 ﻿window.TASKS_DATA = {
-    "gerado_em":  "2026-10-22T10:21:17-03:00",
+    "gerado_em":  "2026-10-22T11:05:23-03:00",
     "fonte":  "C:\\Users\\vivian.alves\\OneDrive - MRV\\Projeto SIM-4. Realize - Documentos\\04. Frentes do projeto \u0026 Planejamento_cronogramas\\ECO-PAM-STREAMLIT\\Agrupamento de Materiais\\2026.10.16_Crono-Agrup. Materiais e Refatoração para ECO.mpp",
     "total_tarefas":  85,
     "total_macros":  16,
@@ -49,7 +49,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Ana Flávia",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  3,
@@ -72,7 +72,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Carlos",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  4,
@@ -118,7 +118,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Carlos;Ana Flávia;Mônica",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  6,
@@ -762,7 +762,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Carlos",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  34,
@@ -785,7 +785,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "André Felix",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  35,
@@ -877,7 +877,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Carlos",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  39,
@@ -900,7 +900,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Robson",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  40,
@@ -923,7 +923,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Leandro",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  41,
@@ -946,7 +946,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Leandro",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  42,
@@ -1038,7 +1038,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Carlos",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  46,
@@ -1061,7 +1061,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Mônica",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  47,
@@ -1153,7 +1153,7 @@
                         "ida":  "1",
                         "evolucao_percentual":  100,
                         "responsavel":  "Carlos",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  51,
@@ -1176,7 +1176,7 @@
                         "ida":  "1,06",
                         "evolucao_percentual":  100,
                         "responsavel":  "André Felix",
-                        "status_inicial":  "concluÃ­da"
+                        "status_inicial":  "concluida"
                     },
                     {
                         "id":  52,
