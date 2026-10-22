@@ -1,0 +1,3445 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard de Cronograma e Kanban</title>
+  <style>
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #dbe2ee;
+  --blue: #2563eb;
+  --amber: #d97706;
+  --green: #15803d;
+  --red: #b91c1c;
+  --soft-orange: #ffedd5;
+  --soft-red: #fee2e2;
+  --soft-yellow: #fef9c3;
+  --soft-green: #dcfce7;
+  --mrv-green-dark: #007a3d;
+  --mrv-green: #009f4d;
+  --mrv-lime: #9acd32;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  background: linear-gradient(100deg, var(--mrv-green-dark), var(--mrv-green));
+  color: #fff;
+  padding: 20px 24px;
+  border-bottom: 4px solid var(--mrv-lime);
+}
+
+header .header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+header .brand-wrap {
+  display: flex;
+  align-items: center;
+}
+
+header .brand-logo-img {
+  height: 40px;
+  width: auto;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+header .leader-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+header .leader-label {
+  font-size: 0.78rem;
+  color: #dcfce7;
+}
+
+header h1 {
+  margin: 0 0 6px;
+  font-size: 1.5rem;
+}
+
+header p {
+  margin: 0;
+  color: #ecfccb;
+}
+
+main {
+  padding: 20px;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.filters input,
+.filters select,
+.filters button {
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 10px;
+}
+
+.filters button {
+  cursor: pointer;
+  color: #fff;
+  background: var(--blue);
+  border-color: var(--blue);
+  margin-top: 22px;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.summary-card h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.summary-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.45rem;
+}
+
+.summary-card.summary-card-atrasada {
+  background: var(--soft-red);
+  border-color: var(--soft-red);
+}
+
+.summary-card.summary-card-planejado {
+  background: #e5e7eb;
+  border-color: #e5e7eb;
+}
+
+.summary-card.summary-card-pendencia {
+  background: var(--soft-yellow);
+  border-color: var(--soft-yellow);
+}
+
+.summary-card.summary-card-andamento {
+  background: var(--soft-orange);
+  border-color: var(--soft-orange);
+}
+
+.summary-card.summary-card-concluida {
+  background: var(--soft-green);
+  border-color: var(--soft-green);
+}
+
+.table-section,
+.kanban-section,
+.timeline-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  padding: 14px;
+}
+
+.table-section h2,
+.kanban-section h2,
+.timeline-section h2 {
+  margin-top: 0;
+}
+
+.global-ida {
+  display: inline-block;
+  margin: 2px 0 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.table-panel-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.table-panel-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.table-panel-filters input {
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 10px;
+}
+
+.table-panel-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.table-panel-actions button {
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--blue);
+  background: var(--blue);
+  color: #fff;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.table-panel-actions button.secondary {
+  background: #fff;
+  color: #334155;
+  border-color: var(--border);
+}
+
+.macro-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timeline-row {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  background: #f8fafc;
+}
+
+.timeline-row.timeline-row-highlight {
+  border: 2px solid #0b6f4f;
+  background: #ecfdf5;
+}
+
+.timeline-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.timeline-track {
+  position: relative;
+  height: 22px;
+  background: #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.timeline-bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 14px;
+  min-width: 34px;
+  background: #cbd5e1;
+  overflow: hidden;
+}
+
+.timeline-bar > span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111827;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.timeline-bar-fill {
+  height: 100%;
+  border-radius: 14px 0 0 14px;
+}
+
+.timeline-bar-fill.complete {
+  border-radius: 14px;
+}
+
+.timeline-bar.timeline-bar-highlight {
+  box-shadow: inset 0 0 0 2px #0b6f4f;
+}
+
+.timeline-badge-highlight {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #064e3b;
+  background: #a7f3d0;
+}
+
+.timeline-bar-fill.status-planejado { background: #cbd5e1; }
+.timeline-bar-fill.status-andamento { background: #fdba74; }
+.timeline-bar-fill.status-pendencia { background: #fde047; }
+.timeline-bar-fill.status-concluida { background: #86efac; }
+.timeline-bar-fill.status-atrasada { background: #fca5a5; }
+
+.table-wrap {
+  overflow: auto;
+  max-height: 470px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+.table-input {
+  width: 100%;
+  min-width: 120px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  padding: 0 8px;
+}
+
+.table-input.progress {
+  min-width: 80px;
+}
+
+.table-input.status {
+  min-width: 140px;
+}
+
+.table-input.date-short {
+  min-width: 90px;
+}
+
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.table-readonly {
+  display: inline-block;
+  min-width: 90px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  z-index: 1;
+}
+
+.badge {
+  border-radius: 14px;
+  padding: 2px 8px;
+  color: #fff;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+.badge-planejado { background: #475569; }
+.badge-andamento { background: #f59e0b; color: #111827; }
+.badge-pendencia { background: #eab308; color: #111827; }
+.badge-concluida { background: #22c55e; }
+.badge-atrasada { background: #ef4444; }
+
+.table-row.status-andamento { background: var(--soft-orange); }
+.table-row.status-atrasada { background: var(--soft-red); }
+.table-row.status-pendencia { background: var(--soft-yellow); }
+.table-row.status-concluida { background: var(--soft-green); }
+
+.row-macro td {
+  font-weight: 700;
+}
+
+.row-project-consolidated td {
+  background: #ecfdf5;
+  color: #064e3b;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.row-project-consolidated td:first-child {
+  box-shadow: inset 4px 0 0 #0b6f4f;
+}
+
+.inline-consolidated-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #064e3b;
+  background: #a7f3d0;
+  vertical-align: middle;
+}
+
+.task-name.subtask-name {
+  padding-left: 0.4cm;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.kanban-column {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-height: 220px;
+  padding: 10px;
+}
+
+.kanban-column h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.column-count {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.kanban-group {
+  margin-bottom: 12px;
+}
+
+.kanban-group-title {
+  margin: 0 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--border);
+  font-size: 0.82rem;
+  color: #334155;
+}
+
+.kanban-empty {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.kanban-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px;
+  margin-bottom: 8px;
+  cursor: grab;
+}
+
+.kanban-card.dragging {
+  opacity: 0.55;
+}
+
+.kanban-card.status-andamento {
+  background: var(--soft-orange);
+  border-color: #fdba74;
+}
+
+.kanban-card.status-atrasada {
+  background: var(--soft-red);
+  border-color: var(--soft-red);
+}
+
+.kanban-card.status-pendencia {
+  background: var(--soft-yellow);
+  border-color: #fde047;
+}
+
+.kanban-card.status-concluida {
+  background: var(--soft-green);
+  border-color: #86efac;
+}
+
+.kanban-card h4 {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+}
+
+.kanban-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.kanban-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.kanban-actions button {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+dialog {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: min(420px, 92vw);
+}
+
+#editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#editForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.readonly-info {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  font-size: 0.9rem;
+}
+
+.readonly-info strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.readonly-info p {
+  margin: 3px 0;
+}
+
+menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+@media (max-width: 1120px) {
+  .kanban-board {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <div class="brand-wrap">
+        <img class="brand-logo-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAAAYCAYAAAB6OOplAAAItklEQVR4AeRYe4xcVRn/fefemZaUaCxWGlqlVUrQAI2RWPuaXRIg6D+SGAJqaBvbCp1tMUg1BqXdAj4SjC+6uxRR4gMJFHlrqVHYmWlaFEKFYGsr2mhpWtrgRtm2M7Nz7+f3nTt39r5mdvvYxIabc873ON937r2/+9vvnFmDCbx463lr+dnznuMtMy+dwNucEUtPGNC8Zcb34OFu+Lgc7H/jjEBjAh9yQoDmZ2beA49vARMEaIBx7gS+wxmxtAX6jreWzO/dt2zy6XhiflpA9nk1FGRPVgylqG1bb7eLnq75befHO7Gq+xPohX0nhNeaxdOwelH3mH3NvHeFKVYunz81ldOzaJ6d6zSsWvSeVN7qxQvNusM33N/wsN2b4u3qPbhsVqc1xprjJ2feJ0xOg8zxd0+sQzjMz4tvO4qFnyEJFMZxaU5P189heAcOF7bEMnzzW7Dz/Jjdm/wmioX7cdP8GTY/785M55gduLEwx863G4i+lpG3yVTZXVoVIOrszj5maPCrb62Y2W6NTn5+QkD2sdIy2WcpF2HZEKnMbpd8U/f5ICyy00RLcKRrk9VPZDhS+LGE3yAdILoKPR8/B3qtvXSKiMukj90IkyV3OUx+mwV7oPIqGE/HEokIDq1Du8ve19ycnvbvMjXfuDV2UfUNauycX6v7lTVvnBjY/JiA7AnIvtzCdgHXyqYtuIuW3aiRpPsKYdY92cEZ3mJBYukLsRnPdax9bKo8iNXGPxBmwck/gS9+LAef1yN5EX8OaxZ8KOkO7Em3QT9YYAQj825MqzxiBNwQ5KZ0Z9WNqawYJ9i8OQmyrB8FWfVOjJbwVCNaLWB/PeVPOnoKd0Jjk/5Tty+DO+Vm3FveKUs9Iz3SyMB374g4AlXZzKYYGLFxA3rhmyaTLch1dqwU8Gc1yK0sO1ycjg4Xb/7AfXKqaJYLCdSNT4HNkjJ9Qo3oLhS7VrbNKRbWAnQSx0Z+GeRdPtr9qwH8Qnq8EQWlyON18QlrXZ9iNU++HVls7i8/rBnCaBdSPlCD2wTZDWx2Z1VrVLl2XzbY/JCA3OAAZGWsgttOst7qZDpvQrFwXSpTPwDR3Sn/eByMIWzcNjjaK1vRV1oC5n8k0ueiV05Dymrm38TnhNVe7s6Wr9g9XUBe1bJDhdCL5mV0I6y1arSLqF1n9wLPcSrXHlwzrRlvBf9KQPZ5fCAr+Mpym3mCA5HUWHoQqxZf08q0wMsHaDlOl0J7Uisdlg1SnT5uVxHrxNcJCT5sfcS3AZRH9NLa3Fd+JHQJo6VcsEFttGw0wQ78ciq54GjNLX+yCTb/UkGWjU8Z3DpdCGVjtiyftMWVbNZ2jCRbLXsgODBmM1YtugIWcAGeSD4ATt9V7D4bxIkzMv8b/YPD9ib3lncK49OsJloHZTP4RhsXHZjWR00zWqMdKR8OYnYIPpyLatV8ee9P5nxfduKVUpdhewimL++trG3ZcouYPQaYEj5GcwXsp0DmUfkTDU4UnRJyTuePp7nFwhJhZK/txC8CNBXRi/F41IQxrTIQ8V8P8ANIsRmvYaC0GZFLGC3lQo52dQuqI8zOtPnFh/YcueS1GZ8+WM8dsSArkLYsNEHuaOsXiNw1qnr6laIOq//TjrGBzkqDzHrXN2Jhaox48lCqdOhEU0DCOu3ARbFIhryZ+U7Mt3HwJTDiP4Y0gKCbqWqR7m+IGFY1diNs1WgBWkCvRWxhOO98+K/bh4eOLx7JubNn75ld/Vctd8iCrfjpq44p7b2yh6zSwVwCeHl2QugVkJl1oxQ2hr6ErI6kASeQjeorDQhwL1g9NfgrpGy8nnbz2EdOrc39lUeTuSZWmy3IDgRcYbaDmkfersd37agOVxdS3gVyBiOT3PdfuP+D3t/r+QP63cHy3CHYwgNrZ8nkncey+8o/lZCscymkXjIYS5DxQpIz/kbeUgmuSY80Pg5D8qEjrlC1tRrPhmamNJzeOCVwtEazg7r0qu9YkI97pvG3p/7yUv1YfQFNcqQKGZhJLkjAbuRzMz7y5hxn70h+vwVbgY6BKyurTz+C9RtxtGlZpYNIvp7EK+uAONjMLJwUxpUflIhTa33b9soH+2Z8ESlRPh6I+yKWryeMiB1Vlc0bK7+OukLd6Pm51gTXgiybvNqH/riv0hhpzKO8I+BKF6mMDmwDP+9M/+h/LhyBghmC2jqFyPK+YNXyg8Vzcs2C7d/SSiasQMD2luuUlPfRtwHeG1uDqAs9BWV7zG0NZTV4q9XTQ9sfUAGjBdxqtGyI3ag1cgoq8kbY7CBLjuScc+UUIs+poAqWvkq5uwVfbGnBvHBQ3Jktu0Zr5mh4X+UH8L0rpWQsTIGsDB+NDLTxnDqCSKB3sAHfLJW14/dk+mHrn1NhbCh90xuqLals7i8/1rITSrxGs5GyEZw6oAwWkE1KSvlo+rWMQMHV8qDSl9X1cUM7KmUqs3UqHdGEgW2/R395e9RldSL5ulYbHcZz6hiNBgYGXwDRxqgLhHeDz5J/WMW8gaHxzL8LjOZI1HGjVEa/HmyITgtktdkxsCDnnIh0EZYPiJ8m5QALrrxrKBVcy2h5gKgU8/+6McmvO8SPioTPyjn7qsznZrO+5Vc295Xi5+7WZKBIjc59vsrOkwJuScpHKZBOaVoeh85x/Ffe6/qvWJlT6cXsBeaonC0F5CS4SduH8jy4Y3ockj/bUqzDfzkd1tYjz8DR/D/g7OGjNvrtoZrceUtsbUbZziUH/RVIcqzTo2W0A1cmQ62trAa+hKBef8b6OgwGF3/5T7j41mtwya3d0b7/YPntA8M75wb9z3MP/DfUVQb2c0d3d7UYreAqq7VzE3zVgy6ONk8xsG1ISkJ3rGtNbhOecveVvhXL7S9fge++GgC9eVcd/aVPJeY32DWyho3yD6b+cvxZ+stfyQq1vr7Sj2TPuFrW323tDoNpO8eGLYi29gohFTwLGiHY4FRK9rjm7UoS/M5t/wMAAP//igeCjwAAAAZJREFUAwD8NJda7A4rCgAAAABJRU5ErkJggg==" alt="Logomarca MRV&CO" />
+      </div>
+      <div class="leader-wrap">
+        <span class="leader-label">Squad LÃ­der do Projeto</span>
+        <strong>Vivian E. Alves de Aguiar</strong>
+      </div>
+    </div>
+    <h1>Dashboard Projeto Tratar ECO para Agrupamento de Materiais e RefatoraÃ§Ã£o dos Programas SAP</h1>
+    <p>Macro tarefas, subtarefas, evoluÃ§Ã£o e quadro kanban com atualizaÃ§Ã£o de cards.</p>
+  </header>
+
+  <main>
+    <section class="filters">
+      <label>
+        Buscar tarefa
+        <input id="searchInput" type="text" placeholder="Digite nome da tarefa..." />
+      </label>
+      <label>
+        Macro tarefa
+        <select id="macroFilter">
+          <option value="">Todas</option>
+        </select>
+      </label>
+      <label>
+        ResponsÃ¡vel
+        <select id="ownerFilter">
+          <option value="">Todos</option>
+        </select>
+      </label>
+      <button id="resetButton" type="button">Limpar filtros</button>
+    </section>
+
+    <section id="summaryCards" class="summary-cards"></section>
+
+    <section class="timeline-section">
+      <h2>Linha do tempo das macro tarefas</h2>
+      <div id="globalIda" class="global-ida">IDA Global do Projeto: ND</div>
+      <div id="macroTimeline" class="macro-timeline"></div>
+    </section>
+
+    <section class="table-section">
+      <h2>Tarefas do cronograma</h2>
+      <div class="table-panel-filters">
+        <label>
+          InÃ­cio da Linha de Base (de)
+          <input id="baselineStartFromFilter" type="text" placeholder="dd/mm/aaaa" />
+        </label>
+        <label>
+          InÃ­cio da Linha de Base (atÃ©)
+          <input id="baselineStartToFilter" type="text" placeholder="dd/mm/aaaa" />
+        </label>
+        <div class="table-panel-actions">
+          <button id="baselineApplyButton" type="button">Filtrar</button>
+          <button id="baselineClearButton" type="button" class="secondary">Limpar filtro</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Estrutura</th>
+              <th>Tipo</th>
+              <th>Tarefa</th>
+              <th>Macro</th>
+              <th>InÃ­cio da Linha de Base</th>
+              <th>TÃ©rmino da Linha de Base</th>
+              <th>InÃ­cio Real</th>
+              <th>TÃ©rmino Real</th>
+              <th>% evoluÃ§Ã£o</th>
+              <th>ResponsÃ¡vel</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="taskTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="kanban-section">
+      <h2>Controle de tarefas (Kanban)</h2>
+      <div id="kanbanBoard" class="kanban-board"></div>
+    </section>
+  </main>
+
+  <dialog id="editDialog">
+    <form method="dialog" id="editForm">
+      <h3 id="editTitle">Atualizar tarefa</h3>
+      <label>
+        Status
+        <select id="editStatus" required>
+          <option value="planejado">planejado</option>
+          <option value="em andamento">em andamento</option>
+          <option value="com pendencia">com pendencia</option>
+          <option value="concluÃ­da">concluÃ­da</option>
+        </select>
+      </label>
+      <label>
+        ResponsÃ¡vel
+        <input id="editOwner" type="text" />
+      </label>
+      <label>
+        % evoluÃ§Ã£o
+        <input id="editProgress" type="number" min="0" max="100" step="1" />
+      </label>
+      <label>
+        InÃ­cio real
+        <input id="editRealStart" type="date" />
+      </label>
+      <label>
+        TÃ©rmino real
+        <input id="editRealFinish" type="date" />
+      </label>
+      <div class="readonly-info">
+        <strong>Linha base (nÃ£o editÃ¡vel)</strong>
+        <p>InÃ­cio: <span id="baselineStartText">-</span></p>
+        <p>TÃ©rmino: <span id="baselineFinishText">-</span></p>
+      </div>
+      <menu>
+        <button value="cancel">Cancelar</button>
+        <button id="saveButton" value="default">Salvar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script>
+window.TASKS_DATA = {
+    "gerado_em":  "2026-10-22T10:21:17-03:00",
+    "fonte":  "C:\\Users\\vivian.alves\\OneDrive - MRV\\Projeto SIM-4. Realize - Documentos\\04. Frentes do projeto \u0026 Planejamento_cronogramas\\ECO-PAM-STREAMLIT\\Agrupamento de Materiais\\2026.10.16_Crono-Agrup. Materiais e Refatoração para ECO.mpp",
+    "total_tarefas":  85,
+    "total_macros":  16,
+    "total_subtarefas":  69,
+    "tarefas":  [
+                    {
+                        "id":  1,
+                        "uid":  1,
+                        "nome":  "Projeto Agrupamento Materiais no ECO",
+                        "nivel":  1,
+                        "estrutura":  "1",
+                        "macro":  true,
+                        "macro_pai":  null,
+                        "inicio":  "2026-08-17",
+                        "termino":  "2027-01-11",
+                        "inicio_real":  "2026-08-17",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-08-17",
+                        "linha_base_termino":  "2027-01-11",
+                        "inicio_real_texto":  "08/17/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "08/17/2026 09:00:00",
+                        "linha_base_termino_texto":  "01/11/2027 18:00:00",
+                        "ida":  "0,99",
+                        "evolucao_percentual":  29,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  2,
+                        "uid":  86,
+                        "nome":  "Levantamento de regras Negócio",
+                        "nivel":  2,
+                        "estrutura":  "1.1",
+                        "macro":  false,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-08-17",
+                        "termino":  "2026-09-04",
+                        "inicio_real":  "2026-08-17",
+                        "termino_real":  "2026-09-04",
+                        "linha_base_inicio":  "2026-08-17",
+                        "linha_base_termino":  "2026-09-04",
+                        "inicio_real_texto":  "08/17/2026 09:00:00",
+                        "termino_real_texto":  "09/04/2026 18:00:00",
+                        "linha_base_inicio_texto":  "08/17/2026 09:00:00",
+                        "linha_base_termino_texto":  "09/04/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Ana Flávia",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  3,
+                        "uid":  87,
+                        "nome":  "Desenho técnico da solução",
+                        "nivel":  2,
+                        "estrutura":  "1.2",
+                        "macro":  false,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-09-07",
+                        "termino":  "2026-09-18",
+                        "inicio_real":  "2026-09-07",
+                        "termino_real":  "2026-09-18",
+                        "linha_base_inicio":  "2026-09-07",
+                        "linha_base_termino":  "2026-09-18",
+                        "inicio_real_texto":  "09/07/2026 09:00:00",
+                        "termino_real_texto":  "09/18/2026 18:00:00",
+                        "linha_base_inicio_texto":  "09/07/2026 09:00:00",
+                        "linha_base_termino_texto":  "09/18/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  4,
+                        "uid":  91,
+                        "nome":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "nivel":  2,
+                        "estrutura":  "1.3",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-10-05",
+                        "termino":  "2026-11-23",
+                        "inicio_real":  "2026-10-05",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-05",
+                        "linha_base_termino":  "2026-11-23",
+                        "inicio_real_texto":  "10/05/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/05/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/23/2026 18:00:00",
+                        "ida":  "0,91",
+                        "evolucao_percentual":  40,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  5,
+                        "uid":  47,
+                        "nome":  "EF - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.3.1",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-10-05",
+                        "termino":  "2026-10-16",
+                        "inicio_real":  "2026-10-05",
+                        "termino_real":  "2026-10-16",
+                        "linha_base_inicio":  "2026-10-05",
+                        "linha_base_termino":  "2026-10-16",
+                        "inicio_real_texto":  "10/05/2026 09:00:00",
+                        "termino_real_texto":  "10/16/2026 18:00:00",
+                        "linha_base_inicio_texto":  "10/05/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/16/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Carlos;Ana Flávia;Mônica",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  6,
+                        "uid":  48,
+                        "nome":  "Dev - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.3.2",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-10-08",
+                        "termino":  "2026-10-30",
+                        "inicio_real":  "2026-10-08",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-08",
+                        "linha_base_termino":  "2026-10-29",
+                        "inicio_real_texto":  "10/08/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/08/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/29/2026 18:00:00",
+                        "ida":  "0,65",
+                        "evolucao_percentual":  40,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  7,
+                        "uid":  108,
+                        "nome":  "Identificar projetos PRD e baixar período anterior (ZPST047)",
+                        "nivel":  3,
+                        "estrutura":  "1.3.3",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-11-03",
+                        "termino":  "2026-11-03",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-30",
+                        "linha_base_termino":  "2026-10-30",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/30/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/30/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  8,
+                        "uid":  104,
+                        "nome":  "Carregar dados de PRD em QAS salvar na ZPST047",
+                        "nivel":  3,
+                        "estrutura":  "1.3.4",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-11-04",
+                        "termino":  "2026-11-04",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-03",
+                        "linha_base_termino":  "2026-11-03",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/03/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/03/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  9,
+                        "uid":  105,
+                        "nome":  "Envio do período atual",
+                        "nivel":  3,
+                        "estrutura":  "1.3.5",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-11-05",
+                        "termino":  "2026-11-05",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-04",
+                        "linha_base_termino":  "2026-11-04",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/04/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/04/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Bruno",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  10,
+                        "uid":  49,
+                        "nome":  "Testes - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.3.6",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-11-06",
+                        "termino":  "2026-11-13",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-06",
+                        "linha_base_termino":  "2026-11-13",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/06/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/13/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia;Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  11,
+                        "uid":  46,
+                        "nome":  "Teste Unitário - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.3.7",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR081 (Fechamento de Custos)",
+                        "inicio":  "2026-11-16",
+                        "termino":  "2026-11-23",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-16",
+                        "linha_base_termino":  "2026-11-23",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/16/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/23/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  12,
+                        "uid":  95,
+                        "nome":  "Agrupamento no Fechamento de Custos",
+                        "nivel":  2,
+                        "estrutura":  "1.4",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-11-13",
+                        "termino":  "2026-12-01",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-13",
+                        "linha_base_termino":  "2026-12-01",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/13/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/01/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  13,
+                        "uid":  97,
+                        "nome":  "EF - ZPSRXXX com Agrupamento (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.4.1",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento no Fechamento de Custos",
+                        "inicio":  "2026-11-13",
+                        "termino":  "2026-11-17",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-13",
+                        "linha_base_termino":  "2026-11-17",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/13/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/17/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Ana Flávia;Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  14,
+                        "uid":  98,
+                        "nome":  "Dev - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.4.2",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento no Fechamento de Custos",
+                        "inicio":  "2026-11-18",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-18",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/18/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  15,
+                        "uid":  96,
+                        "nome":  "Testes - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.4.3",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento no Fechamento de Custos",
+                        "inicio":  "2026-11-26",
+                        "termino":  "2026-11-27",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-26",
+                        "linha_base_termino":  "2026-11-27",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/27/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  16,
+                        "uid":  94,
+                        "nome":  "Teste Unitário - ZPSRXXX (Fechamento de Custos)",
+                        "nivel":  3,
+                        "estrutura":  "1.4.4",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento no Fechamento de Custos",
+                        "inicio":  "2026-11-30",
+                        "termino":  "2026-12-01",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-30",
+                        "linha_base_termino":  "2026-12-01",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/30/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/01/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  17,
+                        "uid":  78,
+                        "nome":  "Refatoração Programa: ZPSR057_1 (Job Diário)",
+                        "nivel":  2,
+                        "estrutura":  "1.5",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-11-18",
+                        "termino":  "2026-12-22",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-18",
+                        "linha_base_termino":  "2026-12-22",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/18/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/22/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  18,
+                        "uid":  79,
+                        "nome":  "EF - ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.5.1",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR057_1 (Job Diário)",
+                        "inicio":  "2026-11-18",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-18",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/18/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia;Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  19,
+                        "uid":  80,
+                        "nome":  "Dev - ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.5.2",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR057_1 (Job Diário)",
+                        "inicio":  "2026-11-26",
+                        "termino":  "2026-12-09",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-26",
+                        "linha_base_termino":  "2026-12-09",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/09/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  20,
+                        "uid":  81,
+                        "nome":  "Testes - ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.5.3",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR057_1 (Job Diário)",
+                        "inicio":  "2026-12-10",
+                        "termino":  "2026-12-16",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-10",
+                        "linha_base_termino":  "2026-12-16",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/10/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/16/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  21,
+                        "uid":  82,
+                        "nome":  "Teste Unitário - ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.5.4",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração Programa: ZPSR057_1 (Job Diário)",
+                        "inicio":  "2026-12-17",
+                        "termino":  "2026-12-22",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-17",
+                        "linha_base_termino":  "2026-12-22",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/17/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/22/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  22,
+                        "uid":  130,
+                        "nome":  "Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "nivel":  2,
+                        "estrutura":  "1.6",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-12-22",
+                        "termino":  "2026-12-29",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-22",
+                        "linha_base_termino":  "2026-12-29",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/22/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/29/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  23,
+                        "uid":  128,
+                        "nome":  "EF - Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.6.1",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "inicio":  "2026-12-22",
+                        "termino":  "2026-12-29",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-22",
+                        "linha_base_termino":  "2026-12-29",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/22/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/29/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  24,
+                        "uid":  129,
+                        "nome":  "Dev - Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.6.2",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "inicio":  "2026-12-29",
+                        "termino":  "2026-12-29",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-29",
+                        "linha_base_termino":  "2026-12-29",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/29/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/29/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  25,
+                        "uid":  127,
+                        "nome":  "Testes - Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.6.3",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "inicio":  "2026-12-29",
+                        "termino":  "2026-12-29",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-29",
+                        "linha_base_termino":  "2026-12-29",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/29/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/29/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia;Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  26,
+                        "uid":  126,
+                        "nome":  "Teste Unitário - Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "nivel":  3,
+                        "estrutura":  "1.6.4",
+                        "macro":  false,
+                        "macro_pai":  "Agrupamento Na ZPSRXXX_1 (Job Diário)",
+                        "inicio":  "2026-12-29",
+                        "termino":  "2026-12-29",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-29",
+                        "linha_base_termino":  "2026-12-29",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/29/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/29/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  27,
+                        "uid":  121,
+                        "nome":  "Refatoração do Estoque Comprometimento",
+                        "nivel":  2,
+                        "estrutura":  "1.7",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-11-30",
+                        "termino":  "2027-01-11",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-30",
+                        "linha_base_termino":  "2027-01-11",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/30/2026 09:00:00",
+                        "linha_base_termino_texto":  "01/11/2027 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  28,
+                        "uid":  122,
+                        "nome":  "EF - Refatoração do Estoque Comprometimento",
+                        "nivel":  3,
+                        "estrutura":  "1.7.1",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração do Estoque Comprometimento",
+                        "inicio":  "2026-11-30",
+                        "termino":  "2026-12-11",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-30",
+                        "linha_base_termino":  "2026-12-11",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/30/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/11/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia;Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  29,
+                        "uid":  123,
+                        "nome":  "Dev - Refatoração do Estoque Comprometimento",
+                        "nivel":  3,
+                        "estrutura":  "1.7.2",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração do Estoque Comprometimento",
+                        "inicio":  "2026-12-14",
+                        "termino":  "2026-12-28",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-14",
+                        "linha_base_termino":  "2026-12-28",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/14/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/28/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  30,
+                        "uid":  124,
+                        "nome":  "Testes - Refatoração do Estoque Comprometimento",
+                        "nivel":  3,
+                        "estrutura":  "1.7.3",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração do Estoque Comprometimento",
+                        "inicio":  "2026-12-29",
+                        "termino":  "2027-01-05",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-29",
+                        "linha_base_termino":  "2027-01-05",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/29/2026 09:00:00",
+                        "linha_base_termino_texto":  "01/05/2027 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Ana Flávia;Mônica",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  31,
+                        "uid":  118,
+                        "nome":  "Teste Unitário - Refatoração do Estoque Comprometimento",
+                        "nivel":  3,
+                        "estrutura":  "1.7.4",
+                        "macro":  false,
+                        "macro_pai":  "Refatoração do Estoque Comprometimento",
+                        "inicio":  "2027-01-06",
+                        "termino":  "2027-01-11",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2027-01-06",
+                        "linha_base_termino":  "2027-01-11",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "01/06/2027 09:00:00",
+                        "linha_base_termino_texto":  "01/11/2027 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  32,
+                        "uid":  2,
+                        "nome":  "Trinca (Diagrama-atividade-substituto)",
+                        "nivel":  2,
+                        "estrutura":  "1.8",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-09-18",
+                        "termino":  "2026-11-03",
+                        "inicio_real":  "2026-09-18",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-09-18",
+                        "linha_base_termino":  "2026-11-03",
+                        "inicio_real_texto":  "09/18/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "09/18/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/03/2026 18:00:00",
+                        "ida":  "1,04",
+                        "evolucao_percentual":  73,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  33,
+                        "uid":  27,
+                        "nome":  "EF Trinca",
+                        "nivel":  3,
+                        "estrutura":  "1.8.1",
+                        "macro":  false,
+                        "macro_pai":  "Trinca (Diagrama-atividade-substituto)",
+                        "inicio":  "2026-09-18",
+                        "termino":  "2026-09-23",
+                        "inicio_real":  "2026-09-18",
+                        "termino_real":  "2026-09-23",
+                        "linha_base_inicio":  "2026-09-18",
+                        "linha_base_termino":  "2026-09-23",
+                        "inicio_real_texto":  "09/18/2026 09:00:00",
+                        "termino_real_texto":  "09/23/2026 18:00:00",
+                        "linha_base_inicio_texto":  "09/18/2026 09:00:00",
+                        "linha_base_termino_texto":  "09/23/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  34,
+                        "uid":  28,
+                        "nome":  "Dev Trinca",
+                        "nivel":  3,
+                        "estrutura":  "1.8.2",
+                        "macro":  false,
+                        "macro_pai":  "Trinca (Diagrama-atividade-substituto)",
+                        "inicio":  "2026-09-24",
+                        "termino":  "2026-10-07",
+                        "inicio_real":  "2026-09-24",
+                        "termino_real":  "2026-10-07",
+                        "linha_base_inicio":  "2026-09-24",
+                        "linha_base_termino":  "2026-10-07",
+                        "inicio_real_texto":  "09/24/2026 09:00:00",
+                        "termino_real_texto":  "10/07/2026 18:00:00",
+                        "linha_base_inicio_texto":  "09/24/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/07/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  35,
+                        "uid":  26,
+                        "nome":  "Testes Trinca",
+                        "nivel":  3,
+                        "estrutura":  "1.8.3",
+                        "macro":  false,
+                        "macro_pai":  "Trinca (Diagrama-atividade-substituto)",
+                        "inicio":  "2026-10-26",
+                        "termino":  "2026-10-30",
+                        "inicio_real":  "2026-10-26",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-26",
+                        "linha_base_termino":  "2026-10-30",
+                        "inicio_real_texto":  "10/26/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/30/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  10,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  36,
+                        "uid":  3,
+                        "nome":  "Teste Unitário - Trinca",
+                        "nivel":  3,
+                        "estrutura":  "1.8.4",
+                        "macro":  false,
+                        "macro_pai":  "Trinca (Diagrama-atividade-substituto)",
+                        "inicio":  "2026-11-03",
+                        "termino":  "2026-11-03",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-03",
+                        "linha_base_termino":  "2026-11-03",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/03/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/03/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  37,
+                        "uid":  69,
+                        "nome":  "Ajuste no PAM",
+                        "nivel":  2,
+                        "estrutura":  "1.9",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-09-23",
+                        "termino":  "2026-11-03",
+                        "inicio_real":  "2026-09-23",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-09-23",
+                        "linha_base_termino":  "2026-11-03",
+                        "inicio_real_texto":  "09/23/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "09/23/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/03/2026 18:00:00",
+                        "ida":  "1,12",
+                        "evolucao_percentual":  69,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  38,
+                        "uid":  70,
+                        "nome":  "EF PS - Ajuste no PAM",
+                        "nivel":  3,
+                        "estrutura":  "1.9.1",
+                        "macro":  false,
+                        "macro_pai":  "Ajuste no PAM",
+                        "inicio":  "2026-09-23",
+                        "termino":  "2026-09-25",
+                        "inicio_real":  "2026-09-23",
+                        "termino_real":  "2026-09-25",
+                        "linha_base_inicio":  "2026-09-23",
+                        "linha_base_termino":  "2026-09-25",
+                        "inicio_real_texto":  "09/23/2026 09:00:00",
+                        "termino_real_texto":  "09/25/2026 18:00:00",
+                        "linha_base_inicio_texto":  "09/23/2026 09:00:00",
+                        "linha_base_termino_texto":  "09/25/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  39,
+                        "uid":  68,
+                        "nome":  "EF MM - Ajuste no PAM",
+                        "nivel":  3,
+                        "estrutura":  "1.9.2",
+                        "macro":  false,
+                        "macro_pai":  "Ajuste no PAM",
+                        "inicio":  "2026-09-28",
+                        "termino":  "2026-09-30",
+                        "inicio_real":  "2026-09-28",
+                        "termino_real":  "2026-09-30",
+                        "linha_base_inicio":  "2026-09-28",
+                        "linha_base_termino":  "2026-09-30",
+                        "inicio_real_texto":  "09/28/2026 09:00:00",
+                        "termino_real_texto":  "09/30/2026 18:00:00",
+                        "linha_base_inicio_texto":  "09/28/2026 09:00:00",
+                        "linha_base_termino_texto":  "09/30/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Robson",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  40,
+                        "uid":  72,
+                        "nome":  "Dev - Ajuste no PAM",
+                        "nivel":  3,
+                        "estrutura":  "1.9.3",
+                        "macro":  false,
+                        "macro_pai":  "Ajuste no PAM",
+                        "inicio":  "2026-10-01",
+                        "termino":  "2026-10-05",
+                        "inicio_real":  "2026-10-01",
+                        "termino_real":  "2026-10-05",
+                        "linha_base_inicio":  "2026-10-01",
+                        "linha_base_termino":  "2026-10-05",
+                        "inicio_real_texto":  "10/01/2026 09:00:00",
+                        "termino_real_texto":  "10/05/2026 18:00:00",
+                        "linha_base_inicio_texto":  "10/01/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/05/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Leandro",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  41,
+                        "uid":  90,
+                        "nome":  "Testes do desenvolvedor",
+                        "nivel":  3,
+                        "estrutura":  "1.9.4",
+                        "macro":  false,
+                        "macro_pai":  "Ajuste no PAM",
+                        "inicio":  "2026-10-19",
+                        "termino":  "2026-10-20",
+                        "inicio_real":  "2026-10-19",
+                        "termino_real":  "2026-10-20",
+                        "linha_base_inicio":  "2026-10-19",
+                        "linha_base_termino":  "2026-10-20",
+                        "inicio_real_texto":  "10/19/2026 09:00:00",
+                        "termino_real_texto":  "10/20/2026 18:00:00",
+                        "linha_base_inicio_texto":  "10/19/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/20/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Leandro",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  42,
+                        "uid":  73,
+                        "nome":  "Testes - Ajuste no PAM",
+                        "nivel":  3,
+                        "estrutura":  "1.9.5",
+                        "macro":  false,
+                        "macro_pai":  "Ajuste no PAM",
+                        "inicio":  "2026-10-21",
+                        "termino":  "2026-10-26",
+                        "inicio_real":  "2026-10-21",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-21",
+                        "linha_base_termino":  "2026-10-26",
+                        "inicio_real_texto":  "10/21/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/21/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/26/2026 18:00:00",
+                        "ida":  "1,81",
+                        "evolucao_percentual":  70,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  43,
+                        "uid":  71,
+                        "nome":  "Teste Unitário - Ajuste no PAM",
+                        "nivel":  3,
+                        "estrutura":  "1.9.6",
+                        "macro":  false,
+                        "macro_pai":  "Ajuste no PAM",
+                        "inicio":  "2026-10-27",
+                        "termino":  "2026-11-03",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-27",
+                        "linha_base_termino":  "2026-11-03",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/27/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/03/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Carvalhais",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  44,
+                        "uid":  4,
+                        "nome":  "Rastreamento do código agrupador",
+                        "nivel":  2,
+                        "estrutura":  "1.10",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-09-28",
+                        "termino":  "2026-11-04",
+                        "inicio_real":  "2026-09-28",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-09-28",
+                        "linha_base_termino":  "2026-11-04",
+                        "inicio_real_texto":  "09/28/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "09/28/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/04/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  46,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  45,
+                        "uid":  30,
+                        "nome":  "EF - Rastreamento do código agrupador",
+                        "nivel":  3,
+                        "estrutura":  "1.10.1",
+                        "macro":  false,
+                        "macro_pai":  "Rastreamento do código agrupador",
+                        "inicio":  "2026-09-28",
+                        "termino":  "2026-09-30",
+                        "inicio_real":  "2026-09-28",
+                        "termino_real":  "2026-09-30",
+                        "linha_base_inicio":  "2026-09-28",
+                        "linha_base_termino":  "2026-09-30",
+                        "inicio_real_texto":  "09/28/2026 09:00:00",
+                        "termino_real_texto":  "09/30/2026 18:00:00",
+                        "linha_base_inicio_texto":  "09/28/2026 09:00:00",
+                        "linha_base_termino_texto":  "09/30/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  46,
+                        "uid":  31,
+                        "nome":  "Dev - Rastreamento do código agrupador",
+                        "nivel":  3,
+                        "estrutura":  "1.10.2",
+                        "macro":  false,
+                        "macro_pai":  "Rastreamento do código agrupador",
+                        "inicio":  "2026-10-08",
+                        "termino":  "2026-10-13",
+                        "inicio_real":  "2026-10-08",
+                        "termino_real":  "2026-10-13",
+                        "linha_base_inicio":  "2026-10-08",
+                        "linha_base_termino":  "2026-10-13",
+                        "inicio_real_texto":  "10/08/2026 09:00:00",
+                        "termino_real_texto":  "10/13/2026 18:00:00",
+                        "linha_base_inicio_texto":  "10/08/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/13/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Mônica",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  47,
+                        "uid":  29,
+                        "nome":  "Testes - Rastreamento do código agrupador",
+                        "nivel":  3,
+                        "estrutura":  "1.10.3",
+                        "macro":  false,
+                        "macro_pai":  "Rastreamento do código agrupador",
+                        "inicio":  "2026-10-26",
+                        "termino":  "2026-10-30",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-26",
+                        "linha_base_termino":  "2026-10-30",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/30/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  48,
+                        "uid":  5,
+                        "nome":  "Teste Unitário - Rastreamento do código agrupador",
+                        "nivel":  3,
+                        "estrutura":  "1.10.4",
+                        "macro":  false,
+                        "macro_pai":  "Rastreamento do código agrupador",
+                        "inicio":  "2026-11-03",
+                        "termino":  "2026-11-04",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-03",
+                        "linha_base_termino":  "2026-11-04",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/03/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/04/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  49,
+                        "uid":  6,
+                        "nome":  "CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "nivel":  2,
+                        "estrutura":  "1.11",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-10-20",
+                        "termino":  "2026-10-28",
+                        "inicio_real":  "2026-10-20",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-20",
+                        "linha_base_termino":  "2026-10-28",
+                        "inicio_real_texto":  "10/20/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/20/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/28/2026 18:00:00",
+                        "ida":  "1,03",
+                        "evolucao_percentual":  57,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  50,
+                        "uid":  33,
+                        "nome":  "EF - CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "nivel":  3,
+                        "estrutura":  "1.11.1",
+                        "macro":  false,
+                        "macro_pai":  "CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "inicio":  "2026-10-20",
+                        "termino":  "2026-10-21",
+                        "inicio_real":  "2026-10-20",
+                        "termino_real":  "2026-10-21",
+                        "linha_base_inicio":  "2026-10-20",
+                        "linha_base_termino":  "2026-10-21",
+                        "inicio_real_texto":  "10/20/2026 09:00:00",
+                        "termino_real_texto":  "10/21/2026 18:00:00",
+                        "linha_base_inicio_texto":  "10/20/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/21/2026 18:00:00",
+                        "ida":  "1",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  51,
+                        "uid":  34,
+                        "nome":  "Dev - CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "nivel":  3,
+                        "estrutura":  "1.11.2",
+                        "macro":  false,
+                        "macro_pai":  "CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "inicio":  "2026-10-21",
+                        "termino":  "2026-10-22",
+                        "inicio_real":  "2026-10-21",
+                        "termino_real":  "2026-10-22",
+                        "linha_base_inicio":  "2026-10-21",
+                        "linha_base_termino":  "2026-10-22",
+                        "inicio_real_texto":  "10/21/2026 08:00:00",
+                        "termino_real_texto":  "10/22/2026 18:00:00",
+                        "linha_base_inicio_texto":  "10/21/2026 08:00:00",
+                        "linha_base_termino_texto":  "10/22/2026 18:00:00",
+                        "ida":  "1,06",
+                        "evolucao_percentual":  100,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "concluÃ­da"
+                    },
+                    {
+                        "id":  52,
+                        "uid":  32,
+                        "nome":  "Testes - CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "nivel":  3,
+                        "estrutura":  "1.11.3",
+                        "macro":  false,
+                        "macro_pai":  "CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "inicio":  "2026-10-26",
+                        "termino":  "2026-10-27",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-26",
+                        "linha_base_termino":  "2026-10-27",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/27/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  53,
+                        "uid":  7,
+                        "nome":  "Teste Unitário - CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "nivel":  3,
+                        "estrutura":  "1.11.4",
+                        "macro":  false,
+                        "macro_pai":  "CDS MATDOC (incluir agrupador) - cenário estoque",
+                        "inicio":  "2026-10-28",
+                        "termino":  "2026-10-28",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-28",
+                        "linha_base_termino":  "2026-10-28",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/28/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/28/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  54,
+                        "uid":  8,
+                        "nome":  "Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "nivel":  2,
+                        "estrutura":  "1.12",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-11-25",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-25",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/25/2026 18:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  55,
+                        "uid":  36,
+                        "nome":  "EF - Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "nivel":  3,
+                        "estrutura":  "1.12.1",
+                        "macro":  false,
+                        "macro_pai":  "Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "inicio":  "2026-11-25",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-25",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/25/2026 18:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  56,
+                        "uid":  37,
+                        "nome":  "Dev - Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "nivel":  3,
+                        "estrutura":  "1.12.2",
+                        "macro":  false,
+                        "macro_pai":  "Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "inicio":  "2026-11-25",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-25",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/25/2026 18:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  57,
+                        "uid":  35,
+                        "nome":  "Testes - Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "nivel":  3,
+                        "estrutura":  "1.12.3",
+                        "macro":  false,
+                        "macro_pai":  "Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "inicio":  "2026-11-25",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-25",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/25/2026 18:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  58,
+                        "uid":  9,
+                        "nome":  "Teste Unitário - Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "nivel":  3,
+                        "estrutura":  "1.12.4",
+                        "macro":  false,
+                        "macro_pai":  "Interface + ZPST047 + CDS envio ECO - ajuste",
+                        "inicio":  "2026-11-25",
+                        "termino":  "2026-11-25",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-25",
+                        "linha_base_termino":  "2026-11-25",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/25/2026 18:00:00",
+                        "linha_base_termino_texto":  "11/25/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  59,
+                        "uid":  14,
+                        "nome":  "ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "nivel":  2,
+                        "estrutura":  "1.13",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-10-22",
+                        "termino":  "2026-11-06",
+                        "inicio_real":  "2026-10-22",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-22",
+                        "linha_base_termino":  "2026-11-06",
+                        "inicio_real_texto":  "10/22/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/22/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/06/2026 18:00:00",
+                        "ida":  "1,02",
+                        "evolucao_percentual":  8,
+                        "responsavel":  "",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  60,
+                        "uid":  51,
+                        "nome":  "EF - ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "nivel":  3,
+                        "estrutura":  "1.13.1",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "inicio":  "2026-10-22",
+                        "termino":  "2026-10-27",
+                        "inicio_real":  "2026-10-22",
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-22",
+                        "linha_base_termino":  "2026-10-27",
+                        "inicio_real_texto":  "10/22/2026 09:00:00",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/22/2026 09:00:00",
+                        "linha_base_termino_texto":  "10/27/2026 18:00:00",
+                        "ida":  "1,02",
+                        "evolucao_percentual":  18,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "em andamento"
+                    },
+                    {
+                        "id":  61,
+                        "uid":  52,
+                        "nome":  "Dev - ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "nivel":  3,
+                        "estrutura":  "1.13.2",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "inicio":  "2026-10-28",
+                        "termino":  "2026-11-04",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-28",
+                        "linha_base_termino":  "2026-11-04",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/28/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/04/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  62,
+                        "uid":  50,
+                        "nome":  "Testes - ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "nivel":  3,
+                        "estrutura":  "1.13.3",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "inicio":  "2026-11-05",
+                        "termino":  "2026-11-05",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-05",
+                        "linha_base_termino":  "2026-11-05",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/05/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/05/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  63,
+                        "uid":  19,
+                        "nome":  "Teste Unitário - ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "nivel":  3,
+                        "estrutura":  "1.13.4",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_PARA_ECC_ECO",
+                        "inicio":  "2026-11-06",
+                        "termino":  "2026-11-06",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-06",
+                        "linha_base_termino":  "2026-11-06",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/06/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/06/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  64,
+                        "uid":  16,
+                        "nome":  "ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "nivel":  2,
+                        "estrutura":  "1.14",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-10-26",
+                        "termino":  "2026-11-11",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-26",
+                        "linha_base_termino":  "2026-11-11",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/11/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  65,
+                        "uid":  54,
+                        "nome":  "EF - ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "nivel":  3,
+                        "estrutura":  "1.14.1",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "inicio":  "2026-10-26",
+                        "termino":  "2026-11-05",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-26",
+                        "linha_base_termino":  "2026-11-05",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/26/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/05/2026 09:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  66,
+                        "uid":  55,
+                        "nome":  "Dev - ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "nivel":  3,
+                        "estrutura":  "1.14.2",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "inicio":  "2026-11-05",
+                        "termino":  "2026-11-09",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-05",
+                        "linha_base_termino":  "2026-11-09",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/05/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/09/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  67,
+                        "uid":  53,
+                        "nome":  "Testes - ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "nivel":  3,
+                        "estrutura":  "1.14.3",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "inicio":  "2026-11-10",
+                        "termino":  "2026-11-10",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-10",
+                        "linha_base_termino":  "2026-11-10",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/10/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/10/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  68,
+                        "uid":  20,
+                        "nome":  "Teste Unitário - ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "nivel":  3,
+                        "estrutura":  "1.14.4",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_ECO_PARALELO (avaliar)",
+                        "inicio":  "2026-11-11",
+                        "termino":  "2026-11-11",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-11",
+                        "linha_base_termino":  "2026-11-11",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/11/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/11/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  69,
+                        "uid":  15,
+                        "nome":  "ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "nivel":  2,
+                        "estrutura":  "1.15",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-10-29",
+                        "termino":  "2026-11-16",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-29",
+                        "linha_base_termino":  "2026-11-16",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/29/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/16/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  70,
+                        "uid":  59,
+                        "nome":  "EF - ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "nivel":  3,
+                        "estrutura":  "1.15.1",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "inicio":  "2026-10-29",
+                        "termino":  "2026-11-10",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-10-29",
+                        "linha_base_termino":  "2026-11-10",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "10/29/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/10/2026 09:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  71,
+                        "uid":  60,
+                        "nome":  "Dev - ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "nivel":  3,
+                        "estrutura":  "1.15.2",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "inicio":  "2026-11-10",
+                        "termino":  "2026-11-12",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-10",
+                        "linha_base_termino":  "2026-11-12",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/10/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/12/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  72,
+                        "uid":  61,
+                        "nome":  "Testes - ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "nivel":  3,
+                        "estrutura":  "1.15.3",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "inicio":  "2026-11-13",
+                        "termino":  "2026-11-13",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-13",
+                        "linha_base_termino":  "2026-11-13",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/13/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/13/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  73,
+                        "uid":  62,
+                        "nome":  "Teste Unitário - ZPS_RFC_STREAMLIT_CONTR_FORNEC (avaliar)",
+                        "nivel":  3,
+                        "estrutura":  "1.15.4",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_RFC_STREAMLIT_CONTR_FORNEC",
+                        "inicio":  "2026-11-16",
+                        "termino":  "2026-11-16",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-16",
+                        "linha_base_termino":  "2026-11-16",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/16/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/16/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  74,
+                        "uid":  25,
+                        "nome":  "ZPS_FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "nivel":  2,
+                        "estrutura":  "1.16",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-11-04",
+                        "termino":  "2026-11-19",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-04",
+                        "linha_base_termino":  "2026-11-19",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/04/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/19/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  75,
+                        "uid":  63,
+                        "nome":  "EF - FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "nivel":  3,
+                        "estrutura":  "1.16.1",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "inicio":  "2026-11-04",
+                        "termino":  "2026-11-13",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-04",
+                        "linha_base_termino":  "2026-11-13",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/04/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/13/2026 09:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  76,
+                        "uid":  42,
+                        "nome":  "Dev - FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "nivel":  3,
+                        "estrutura":  "1.16.2",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "inicio":  "2026-11-13",
+                        "termino":  "2026-11-17",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-13",
+                        "linha_base_termino":  "2026-11-17",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/13/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/17/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  77,
+                        "uid":  43,
+                        "nome":  "Testes - FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "nivel":  3,
+                        "estrutura":  "1.16.3",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "inicio":  "2026-11-18",
+                        "termino":  "2026-11-18",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-18",
+                        "linha_base_termino":  "2026-11-18",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/18/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/18/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  78,
+                        "uid":  44,
+                        "nome":  "Teste Unitário - FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "nivel":  3,
+                        "estrutura":  "1.16.4",
+                        "macro":  false,
+                        "macro_pai":  "ZPS_FECHAMENTO_CUSTO_PARALELO2 (ZCOOI e ZCOEP)",
+                        "inicio":  "2026-11-19",
+                        "termino":  "2026-11-19",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-19",
+                        "linha_base_termino":  "2026-11-19",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/19/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/19/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  79,
+                        "uid":  109,
+                        "nome":  "Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "nivel":  2,
+                        "estrutura":  "1.17",
+                        "macro":  true,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-11-09",
+                        "termino":  "2026-12-15",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-09",
+                        "linha_base_termino":  "2026-12-15",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/09/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/15/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  80,
+                        "uid":  110,
+                        "nome":  "EF - Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "nivel":  3,
+                        "estrutura":  "1.17.1",
+                        "macro":  false,
+                        "macro_pai":  "Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "inicio":  "2026-11-16",
+                        "termino":  "2026-11-30",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-16",
+                        "linha_base_termino":  "2026-11-30",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/16/2026 09:00:00",
+                        "linha_base_termino_texto":  "11/30/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Carlos;Elza;Ana Flávia",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  81,
+                        "uid":  111,
+                        "nome":  "DEV - Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "nivel":  3,
+                        "estrutura":  "1.17.2",
+                        "macro":  false,
+                        "macro_pai":  "Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "inicio":  "2026-12-01",
+                        "termino":  "2026-12-07",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-01",
+                        "linha_base_termino":  "2026-12-07",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/01/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/07/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Felix",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  82,
+                        "uid":  114,
+                        "nome":  "Desenvolvimento front end + back end (Streamlit) + ZPS_RFC_STREAMLIT_CONTR_FORNEC (associado)",
+                        "nivel":  3,
+                        "estrutura":  "1.17.3",
+                        "macro":  false,
+                        "macro_pai":  "Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "inicio":  "2026-11-09",
+                        "termino":  "2026-12-07",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-11-09",
+                        "linha_base_termino":  "2026-12-07",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "11/09/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/07/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Izefler",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  83,
+                        "uid":  115,
+                        "nome":  "Testes Streamlit recebendo dados da CDS View",
+                        "nivel":  3,
+                        "estrutura":  "1.17.4",
+                        "macro":  false,
+                        "macro_pai":  "Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "inicio":  "2026-12-08",
+                        "termino":  "2026-12-10",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-08",
+                        "linha_base_termino":  "2026-12-10",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/08/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/10/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Izefler",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  84,
+                        "uid":  112,
+                        "nome":  "Teste Unitário - Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "nivel":  3,
+                        "estrutura":  "1.17.5",
+                        "macro":  false,
+                        "macro_pai":  "Envio agrupador + associado para ECO Aplicação (CDS View)",
+                        "inicio":  "2026-12-11",
+                        "termino":  "2026-12-15",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-11",
+                        "linha_base_termino":  "2026-12-15",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/11/2026 09:00:00",
+                        "linha_base_termino_texto":  "12/15/2026 18:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "André Reis",
+                        "status_inicial":  "planejado"
+                    },
+                    {
+                        "id":  85,
+                        "uid":  88,
+                        "nome":  "Liberação para uso do agrupador pelas obras",
+                        "nivel":  2,
+                        "estrutura":  "1.18",
+                        "macro":  false,
+                        "macro_pai":  "Projeto Agrupamento Materiais no ECO",
+                        "inicio":  "2026-12-29",
+                        "termino":  "2026-12-29",
+                        "inicio_real":  null,
+                        "termino_real":  null,
+                        "linha_base_inicio":  "2026-12-29",
+                        "linha_base_termino":  "2026-12-29",
+                        "inicio_real_texto":  "ND",
+                        "termino_real_texto":  "ND",
+                        "linha_base_inicio_texto":  "12/29/2026 17:00:00",
+                        "linha_base_termino_texto":  "12/29/2026 17:00:00",
+                        "ida":  "0",
+                        "evolucao_percentual":  0,
+                        "responsavel":  "Time TI",
+                        "status_inicial":  "planejado"
+                    }
+                ]
+}
+;
+
+</script>
+<script>
+const STATUS_COLUMNS = ["planejado", "em andamento", "com pendencia", "concluÃ­da"];
+const STATUS_ATRASADA = "atrasada";
+const PROJECT_PROGRESS_MACRO_NAME = "Projeto Agrupamento Materiais no ECO";
+const FORCED_MACRO_TASK_NAMES = [
+  "Levantamento de regras NegÃ³cio",
+  "Desenho tÃ©cnico da soluÃ§Ã£o",
+];
+const STORAGE_KEY = "eco_kanban_overrides_v1";
+const DATA_VERSION_KEY = "eco_dashboard_data_version_v1";
+const AUTO_RELOAD_MS = 45000;
+const SYNC_API_URL = "http://127.0.0.1:8787/api/queue-update";
+
+const state = {
+  tarefas: [],
+  resolved: [],
+  filtered: [],
+  overrides: {},
+  currentEditUid: null,
+};
+
+const el = {
+  searchInput: document.getElementById("searchInput"),
+  macroFilter: document.getElementById("macroFilter"),
+  ownerFilter: document.getElementById("ownerFilter"),
+  baselineStartFromFilter: document.getElementById("baselineStartFromFilter"),
+  baselineStartToFilter: document.getElementById("baselineStartToFilter"),
+  baselineApplyButton: document.getElementById("baselineApplyButton"),
+  baselineClearButton: document.getElementById("baselineClearButton"),
+  resetButton: document.getElementById("resetButton"),
+  summaryCards: document.getElementById("summaryCards"),
+  globalIda: document.getElementById("globalIda"),
+  macroTimeline: document.getElementById("macroTimeline"),
+  taskTableBody: document.getElementById("taskTableBody"),
+  kanbanBoard: document.getElementById("kanbanBoard"),
+  editDialog: document.getElementById("editDialog"),
+  editTitle: document.getElementById("editTitle"),
+  editStatus: document.getElementById("editStatus"),
+  editOwner: document.getElementById("editOwner"),
+  editProgress: document.getElementById("editProgress"),
+  editRealStart: document.getElementById("editRealStart"),
+  editRealFinish: document.getElementById("editRealFinish"),
+  baselineStartText: document.getElementById("baselineStartText"),
+  baselineFinishText: document.getElementById("baselineFinishText"),
+  editForm: document.getElementById("editForm"),
+};
+
+function loadOverrides() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state.overrides = raw ? JSON.parse(raw) : {};
+  } catch {
+    state.overrides = {};
+  }
+}
+
+function persistOverrides() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.overrides));
+}
+
+function reconcileOverridesWithProjectData(data) {
+  const currentVersion = String(data?.gerado_em || "");
+  if (!currentVersion) return;
+  const lastVersion = localStorage.getItem(DATA_VERSION_KEY) || "";
+  if (lastVersion && lastVersion !== currentVersion) {
+    state.overrides = {};
+    persistOverrides();
+  }
+  localStorage.setItem(DATA_VERSION_KEY, currentVersion);
+}
+
+async function enqueueProjectSync(uid, updates) {
+  try {
+    const payload = {
+      uid,
+      timestamp: new Date().toISOString(),
+      updates: {
+        status_atual: updates.status_atual,
+        evolucao_percentual_atual: updates.evolucao_percentual_atual,
+        inicio_real: updates.inicio_real,
+        termino_real: updates.termino_real,
+      },
+    };
+    await fetch(SYNC_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      mode: "cors",
+    });
+  } catch {
+    // SincronizaÃ§Ã£o local opcional: ignora se serviÃ§o nÃ£o estiver em execuÃ§Ã£o.
+  }
+}
+
+function getTodayIsoLocal() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function normalizeKanbanStatus(status) {
+  const value = normalize(status);
+  if (value.includes("conclu")) return "concluÃ­da";
+  if (value.includes("andamento")) return "em andamento";
+  if (value.includes("pend")) return "com pendencia";
+  if (value.includes("planej")) return "planejado";
+  return "planejado";
+}
+
+function isDelayedAgainstBaseline(task, progress) {
+  if ((Number(progress) || 0) >= 100) return false;
+  const realStart = task.inicio_real_atual || null;
+  const baselineStart = task.linha_base_inicio || null;
+  const realFinish = task.termino_real_atual || null;
+  const baselineFinish = task.linha_base_termino || null;
+  const delayedStart = Boolean(realStart && baselineStart && realStart > baselineStart);
+  const delayedFinish = Boolean(realFinish && baselineFinish && realFinish > baselineFinish);
+  return delayedStart || delayedFinish;
+}
+
+function isForcedMacroTaskName(name) {
+  const normalizedName = normalize(name);
+  return FORCED_MACRO_TASK_NAMES.some((macroName) => normalize(macroName) === normalizedName);
+}
+
+function isProjectProgressMacroTask(task) {
+  return Boolean(task && task.macro && normalize(task.nome) === normalize(PROJECT_PROGRESS_MACRO_NAME));
+}
+
+function applyOverrides(task) {
+  const over = state.overrides[String(task.uid)] || {};
+  const isForcedMacro = isForcedMacroTaskName(task.nome);
+  const isMacroTask = Boolean(task.macro || isForcedMacro);
+  const isProjectProgressMacro = isMacroTask && normalize(task.nome) === normalize(PROJECT_PROGRESS_MACRO_NAME);
+  const effectiveRealStart = isProjectProgressMacro ? (task.inicio_real ?? null) : (over.inicio_real ?? task.inicio_real ?? null);
+  const effectiveRealFinish = isProjectProgressMacro ? (task.termino_real ?? null) : (over.termino_real ?? task.termino_real ?? null);
+  const kanbanStatus = normalizeKanbanStatus((isProjectProgressMacro ? task.status_inicial : (over.status_atual || task.status_inicial)) || "planejado");
+  const baseProgress = Number(task.evolucao_percentual) || 0;
+  let progress = isProjectProgressMacro ? baseProgress : Number(over.evolucao_percentual_atual);
+  if (Number.isNaN(progress)) {
+    progress = baseProgress;
+  }
+  if (!isProjectProgressMacro && (kanbanStatus === "concluÃ­da" || progress >= 100)) {
+    progress = 100;
+  }
+  const patchedTask = {
+    ...task,
+    macro: isMacroTask,
+    macro_pai: isForcedMacro ? null : task.macro_pai,
+    inicio_real_atual: effectiveRealStart,
+    termino_real_atual: effectiveRealFinish,
+    linha_base_inicio: task.linha_base_inicio ?? null,
+    linha_base_termino: task.linha_base_termino ?? null,
+  };
+  const delayed = isDelayedAgainstBaseline(patchedTask, progress);
+  const visualStatus = progress >= 100 ? "concluÃ­da" : (delayed ? STATUS_ATRASADA : kanbanStatus);
+
+  return {
+    ...patchedTask,
+    kanban_status: kanbanStatus,
+    status_atual: visualStatus,
+    atrasada: delayed,
+    ida_atual: task.ida ?? "ND",
+    evolucao_atual: progress,
+    inicio_real_texto_atual: formatDateShort(effectiveRealStart),
+    termino_real_texto_atual: formatDateShort(effectiveRealFinish),
+    linha_base_inicio_texto: formatDateShort(task.linha_base_inicio),
+    linha_base_termino_texto: formatDateShort(task.linha_base_termino),
+    responsavel_atual: over.responsavel_atual ?? task.responsavel ?? "",
+  };
+}
+
+function rollupMacroTasks(tasks) {
+  const rolled = tasks.map((t) => ({ ...t }));
+  const macros = rolled.filter((t) => t.macro && t.estrutura).sort((a, b) => b.estrutura.length - a.estrutura.length);
+
+  macros.forEach((macro) => {
+    const isProjectProgressMacro = isProjectProgressMacroTask(macro);
+    const subtasks = rolled.filter((t) => !t.macro && t.estrutura && t.estrutura.startsWith(`${macro.estrutura}.`));
+    if (subtasks.length === 0) return;
+
+    const macroProgress = clampProgress(macro.evolucao_atual ?? macro.evolucao_percentual ?? 0, 0);
+    const starts = subtasks.map((t) => t.inicio_real_atual).filter(Boolean).sort();
+    const finishes = subtasks.map((t) => t.termino_real_atual).filter(Boolean).sort();
+    const firstStart = starts.length ? starts[0] : null;
+    const lastFinish = finishes.length ? finishes[finishes.length - 1] : null;
+
+    let macroStatus = "planejado";
+    if (macroProgress >= 100) {
+      macroStatus = "concluÃ­da";
+    } else if (subtasks.some((t) => t.kanban_status === "com pendencia")) {
+      macroStatus = "com pendencia";
+    } else if (subtasks.some((t) => t.kanban_status === "em andamento" || (Number(t.evolucao_atual) || 0) > 0) || macroProgress > 0) {
+      macroStatus = "em andamento";
+    }
+
+    macro.evolucao_atual = macroProgress;
+    if (isProjectProgressMacro) {
+      macro.inicio_real_atual = macro.inicio_real ?? null;
+      macro.termino_real_atual = macro.termino_real ?? null;
+      macro.inicio_real_texto_atual = formatDateShort(macro.inicio_real);
+      macro.termino_real_texto_atual = formatDateShort(macro.termino_real);
+    } else {
+      macro.inicio_real_atual = firstStart;
+      macro.termino_real_atual = lastFinish;
+      macro.inicio_real_texto_atual = formatDateShort(firstStart);
+      macro.termino_real_texto_atual = formatDateShort(lastFinish);
+    }
+    const macroDelayed = isDelayedAgainstBaseline(macro, macroProgress);
+    macro.status_atual = macroProgress >= 100 ? "concluÃ­da" : (macroDelayed ? STATUS_ATRASADA : macroStatus);
+    macro.kanban_status = macro.status_atual === STATUS_ATRASADA ? "em andamento" : macroStatus;
+    macro.atrasada = macro.status_atual === STATUS_ATRASADA;
+  });
+
+  return rolled;
+}
+
+function clampProgress(value, fallback = 0) {
+  let progress = Number(value);
+  if (Number.isNaN(progress)) {
+    progress = fallback;
+  }
+  return Math.max(0, Math.min(100, Math.round(progress)));
+}
+
+function formatDate(isoDate) {
+  if (!isoDate) return "-";
+  const [y, m, d] = isoDate.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function formatDateShort(isoDate) {
+  if (!isoDate) return "ND";
+  const [y, m, d] = isoDate.split("-");
+  if (!y || !m || !d) return "ND";
+  return `${d}/${m}/${String(y).slice(-2)}`;
+}
+
+function parseDateToIso(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
+
+  const match = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (!match) return null;
+  const day = match[1].padStart(2, "0");
+  const month = match[2].padStart(2, "0");
+  const yearRaw = match[3];
+  const year = yearRaw.length === 2 ? `20${yearRaw}` : yearRaw;
+  return `${year}-${month}-${day}`;
+}
+
+function toDate(isoDate) {
+  if (!isoDate) return null;
+  const d = new Date(`${isoDate}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function normalize(value) {
+  return String(value || "").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
+function parseOwnerTokens(value) {
+  return String(value || "")
+    .split(";")
+    .map((x) => x.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function statusBadgeClass(status) {
+  if (status === STATUS_ATRASADA) return "badge-atrasada";
+  if (status === "planejado") return "badge-planejado";
+  if (status === "em andamento") return "badge-andamento";
+  if (status === "com pendencia") return "badge-pendencia";
+  return "badge-concluida";
+}
+
+function statusClassSuffix(status) {
+  if (status === STATUS_ATRASADA) return "atrasada";
+  if (status === "em andamento") return "andamento";
+  if (status === "com pendencia") return "pendencia";
+  if (status === "concluÃ­da") return "concluida";
+  return "planejado";
+}
+
+function renderFilters() {
+  const resolvedPreview = rollupMacroTasks(state.tarefas.map(applyOverrides));
+  const macros = [...new Set(resolvedPreview.filter((t) => t.macro).map((t) => t.nome))];
+  const owners = [...new Set(
+    resolvedPreview
+      .map((t) => t.responsavel_atual)
+      .flatMap((r) => parseOwnerTokens(r))
+  )].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+  el.macroFilter.innerHTML = `<option value="">Todas</option>${macros.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("")}`;
+  el.ownerFilter.innerHTML = `<option value="">Todos</option>${owners.map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join("")}`;
+}
+
+function applyFilters() {
+  const search = normalize(el.searchInput.value);
+  const macro = el.macroFilter.value;
+  const owner = el.ownerFilter.value;
+  const ownerNormalized = normalize(owner);
+  const baselineStartFrom = parseDateToIso(el.baselineStartFromFilter.value);
+  const baselineStartTo = parseDateToIso(el.baselineStartToFilter.value);
+  const hasBaselineStartRange = Boolean(baselineStartFrom || baselineStartTo);
+
+  state.resolved = rollupMacroTasks(state.tarefas.map(applyOverrides));
+
+  state.filtered = state.resolved
+    .filter((t) => {
+      const okSearch = !search || normalize(`${t.nome} ${t.macro_pai || ""}`).includes(search);
+      const okMacro = !macro || t.macro_pai === macro || t.nome === macro;
+      const okOwner = !owner || parseOwnerTokens(t.responsavel_atual).some((name) => normalize(name) === ownerNormalized);
+      const baselineStart = t.linha_base_inicio || null;
+      const okBaselineStartFrom = !baselineStartFrom || (baselineStart && baselineStart >= baselineStartFrom);
+      const okBaselineStartTo = !baselineStartTo || (baselineStart && baselineStart <= baselineStartTo);
+      const okBaselineStartRange = okBaselineStartFrom && okBaselineStartTo;
+      const okSubtaskWhenRange = !hasBaselineStartRange || !t.macro;
+      return okSearch && okMacro && okOwner && okBaselineStartRange && okSubtaskWhenRange;
+    });
+
+  renderSummary();
+  renderMacroTimeline();
+  renderTable();
+  renderKanban();
+}
+
+function renderMacroTimeline() {
+  const globalMacro = state.resolved.find((t) => isProjectProgressMacroTask(t));
+  if (el.globalIda) {
+    const idaGlobal = globalMacro ? String(globalMacro.ida_atual || globalMacro.ida || "ND").trim() : "ND";
+    el.globalIda.textContent = `IDA Global do Projeto: ${idaGlobal || "ND"}`;
+  }
+
+  const visibleMacroNames = new Set();
+  state.filtered.forEach((t) => {
+    if (t.macro) {
+      visibleMacroNames.add(t.nome);
+    } else if (t.macro_pai) {
+      visibleMacroNames.add(t.macro_pai);
+    }
+  });
+
+  const macros = state.resolved
+    .filter((t) => t.macro && (visibleMacroNames.size === 0 || visibleMacroNames.has(t.nome)))
+    .sort((a, b) => a.id - b.id);
+
+  if (macros.length === 0) {
+    el.macroTimeline.innerHTML = '<p class="kanban-empty">Nenhuma macro tarefa para os filtros atuais.</p>';
+    return;
+  }
+
+  const dates = macros
+    .flatMap((m) => [m.inicio || m.linha_base_inicio, m.termino || m.linha_base_termino])
+    .map(toDate)
+    .filter(Boolean);
+
+  const minDate = new Date(Math.min(...dates.map((d) => d.getTime())));
+  const maxDate = new Date(Math.max(...dates.map((d) => d.getTime())));
+  const totalMs = Math.max(maxDate.getTime() - minDate.getTime(), 86400000);
+
+  el.macroTimeline.innerHTML = macros.map((m) => {
+    const isProjectProgressMacro = isProjectProgressMacroTask(m);
+    const progressFill = clampProgress(m.evolucao_atual, 0);
+    const start = toDate(m.inicio || m.linha_base_inicio) || minDate;
+    const end = toDate(m.termino || m.linha_base_termino) || maxDate;
+    const left = ((start.getTime() - minDate.getTime()) / totalMs) * 100;
+    const width = Math.max(((end.getTime() - start.getTime()) / totalMs) * 100, 1.4);
+    return `
+      <article class="timeline-row ${isProjectProgressMacro ? "timeline-row-highlight" : ""}">
+        <div class="timeline-meta">
+          <strong>${escapeHtml(m.nome)}${isProjectProgressMacro ? ' <span class="timeline-badge-highlight">Consolidado</span>' : ""}</strong>
+          <span>${formatDateShort(m.inicio || m.linha_base_inicio)} â†’ ${formatDateShort(m.termino || m.linha_base_termino)} | ${progressFill}%</span>
+        </div>
+        <div class="timeline-track">
+          <div class="timeline-bar status-${statusClassSuffix(m.status_atual)} ${isProjectProgressMacro ? "timeline-bar-highlight" : ""}" style="left:${left.toFixed(2)}%; width:${width.toFixed(2)}%">
+            <div class="timeline-bar-fill status-${statusClassSuffix(m.status_atual)} ${progressFill >= 100 ? "complete" : ""}" style="width:${progressFill}%"></div>
+            <span>${progressFill}%</span>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderSummary() {
+  const total = state.filtered.length;
+  const macros = state.filtered.filter((t) => t.macro).length;
+  const subtarefas = total - macros;
+
+  const statusCount = [...STATUS_COLUMNS, STATUS_ATRASADA].reduce((acc, st) => ({ ...acc, [st]: 0 }), {});
+  state.filtered.forEach((t) => { statusCount[t.status_atual] = (statusCount[t.status_atual] || 0) + 1; });
+
+  el.summaryCards.innerHTML = `
+    <article class="summary-card"><h3>Total de tarefas</h3><strong>${total}</strong></article>
+    <article class="summary-card"><h3>Macro tarefas</h3><strong>${macros}</strong></article>
+    <article class="summary-card"><h3>Subtarefas</h3><strong>${subtarefas}</strong></article>
+    <article class="summary-card summary-card-planejado"><h3>Planejado</h3><strong>${statusCount["planejado"] || 0}</strong></article>
+    <article class="summary-card summary-card-andamento"><h3>Em andamento</h3><strong>${statusCount["em andamento"] || 0}</strong></article>
+    <article class="summary-card summary-card-pendencia"><h3>Com pendencia</h3><strong>${statusCount["com pendencia"] || 0}</strong></article>
+    <article class="summary-card summary-card-concluida"><h3>ConcluÃ­da</h3><strong>${statusCount["concluÃ­da"] || 0}</strong></article>
+    <article class="summary-card summary-card-atrasada"><h3>Atrasada</h3><strong>${statusCount[STATUS_ATRASADA] || 0}</strong></article>
+  `;
+}
+
+function renderTable() {
+  const statusOptions = STATUS_COLUMNS.map((status) => `<option value="${escapeHtml(status)}">${escapeHtml(status)}</option>`).join("");
+  const rows = state.filtered
+    .slice()
+    .sort((a, b) => a.id - b.id)
+    .map((t) => {
+      const visualStatus = t.status_atual;
+      const realStartCell = t.macro
+        ? `<span class="table-readonly">${escapeHtml(t.inicio_real_texto_atual || "ND")}</span>`
+        : `<input class="table-input date-short" data-field="inicio_real" data-uid="${t.uid}" type="text" placeholder="dd/mm/aa" value="${escapeHtml(t.inicio_real_texto_atual)}" />`;
+      const realFinishCell = t.macro
+        ? `<span class="table-readonly">${escapeHtml(t.termino_real_texto_atual || "ND")}</span>`
+        : `<input class="table-input date-short" data-field="termino_real" data-uid="${t.uid}" type="text" placeholder="dd/mm/aa" value="${escapeHtml(t.termino_real_texto_atual)}" />`;
+      const progressCell = t.macro
+        ? ((isProjectProgressMacroTask(t) || isForcedMacroTaskName(t.nome))
+          ? `<span class="table-readonly">${escapeHtml(String(t.evolucao_atual))}%</span>`
+          : '<span class="table-readonly">-</span>')
+        : `<input class="table-input progress" data-field="evolucao_percentual_atual" data-uid="${t.uid}" type="number" min="0" max="100" step="1" value="${t.evolucao_atual}" />`;
+      const isProjectMacro = isProjectProgressMacroTask(t);
+      return `
+      <tr class="table-row status-${statusClassSuffix(visualStatus)} ${t.macro ? "row-macro" : "row-subtask"} ${isProjectMacro ? "row-project-consolidated" : ""}">
+        <td>${escapeHtml(t.estrutura)}</td>
+        <td>${t.macro ? "Macro" : "Subtarefa"}</td>
+        <td class="task-name ${t.macro ? "macro-name" : "subtask-name"}">${escapeHtml(t.nome)}${isProjectMacro ? ' <span class="inline-consolidated-badge">Consolidado</span>' : ""}</td>
+        <td>${escapeHtml(t.macro_pai || "-")}</td>
+        <td>${escapeHtml(t.linha_base_inicio_texto)}</td>
+        <td>${escapeHtml(t.linha_base_termino_texto)}</td>
+        <td>${realStartCell}</td>
+        <td>${realFinishCell}</td>
+        <td>${progressCell}</td>
+        <td><input class="table-input owner" data-field="responsavel_atual" data-uid="${t.uid}" type="text" value="${escapeHtml(t.responsavel_atual || "")}" /></td>
+        <td>
+          <div class="status-cell">
+            <select class="table-input status" data-field="status_atual" data-uid="${t.uid}">
+              ${statusOptions}
+            </select>
+            <span class="badge ${statusBadgeClass(t.status_atual)}">${escapeHtml(t.status_atual)}</span>
+          </div>
+        </td>
+      </tr>
+    `;
+    })
+    .join("");
+
+  el.taskTableBody.innerHTML = rows;
+  document.querySelectorAll('select[data-field="status_atual"]').forEach((select) => {
+    const uid = Number(select.getAttribute("data-uid"));
+    const task = state.filtered.find((t) => t.uid === uid);
+    if (task) {
+      select.value = task.kanban_status;
+    }
+  });
+  wireTableEvents();
+}
+
+function wireTableEvents() {
+  document.querySelectorAll(".table-input").forEach((input) => {
+    input.addEventListener("change", () => {
+      const uid = Number(input.getAttribute("data-uid"));
+      const field = input.getAttribute("data-field");
+      if (!uid || !field) return;
+      const currentTask = state.resolved.find((t) => t.uid === uid);
+      if (currentTask && currentTask.macro && (field === "evolucao_percentual_atual" || field === "inicio_real" || field === "termino_real")) {
+        applyFilters();
+        return;
+      }
+
+      if (field === "status_atual") {
+        updateTaskFields(uid, { status_atual: normalizeKanbanStatus(input.value) });
+        return;
+      }
+      if (field === "evolucao_percentual_atual") {
+        updateTaskFields(uid, { evolucao_percentual_atual: clampProgress(input.value, 0) });
+        return;
+      }
+      if (field === "responsavel_atual") {
+        updateTaskFields(uid, { responsavel_atual: input.value.trim() });
+        return;
+      }
+      if (field === "inicio_real") {
+        const iso = parseDateToIso(input.value);
+        if (iso || input.value.trim() === "" || normalize(input.value) === "nd") {
+          updateTaskFields(uid, { inicio_real: iso });
+        } else {
+          applyFilters();
+        }
+        return;
+      }
+      if (field === "termino_real") {
+        const iso = parseDateToIso(input.value);
+        if (iso || input.value.trim() === "" || normalize(input.value) === "nd") {
+          updateTaskFields(uid, { termino_real: iso });
+        } else {
+          applyFilters();
+        }
+      }
+    });
+  });
+}
+
+function renderKanban() {
+  const subtarefas = state.filtered.filter((t) => !t.macro);
+  const macroOrderMap = new Map(
+    state.tarefas
+      .filter((t) => t.macro)
+      .sort((a, b) => a.id - b.id)
+      .map((t, idx) => [t.nome, idx])
+  );
+  const byStatus = Object.fromEntries(STATUS_COLUMNS.map((s) => [s, new Map()]));
+
+  subtarefas.forEach((t) => {
+    const macroName = t.macro_pai || "Sem macro";
+    if (!byStatus[t.kanban_status]) byStatus[t.kanban_status] = new Map();
+    if (!byStatus[t.kanban_status].has(macroName)) {
+      byStatus[t.kanban_status].set(macroName, []);
+    }
+    byStatus[t.kanban_status].get(macroName).push(t);
+  });
+
+  el.kanbanBoard.innerHTML = STATUS_COLUMNS.map((status) => `
+    <article class="kanban-column" data-status="${status}">
+      <h3>${status} <span class="column-count">(${subtarefas.filter((t) => t.kanban_status === status).length})</span></h3>
+      ${Array.from((byStatus[status] || new Map()).entries())
+        .sort((a, b) => {
+          const keyA = macroOrderMap.has(a[0]) ? macroOrderMap.get(a[0]) : Number.MAX_SAFE_INTEGER;
+          const keyB = macroOrderMap.has(b[0]) ? macroOrderMap.get(b[0]) : Number.MAX_SAFE_INTEGER;
+          if (keyA !== keyB) return keyA - keyB;
+          return a[0].localeCompare(b[0], "pt-BR");
+        })
+        .map(([macroName, tasks]) => `
+          <section class="kanban-group">
+            <h4 class="kanban-group-title">${escapeHtml(macroName)} <span class="column-count">(${tasks.length})</span></h4>
+            ${tasks
+              .sort((a, b) => a.id - b.id)
+              .map((t) => `
+                <div class="kanban-card status-${statusClassSuffix(t.status_atual)}" draggable="true" data-uid="${t.uid}">
+                  <h4>${escapeHtml(t.nome)}</h4>
+                  <div class="kanban-meta">
+                    ${formatDateShort(t.inicio)} â†’ ${formatDateShort(t.termino)}<br />
+                    Real: ${formatDateShort(t.inicio_real_atual)} â†’ ${formatDateShort(t.termino_real_atual)}<br />
+                    Linha base: ${formatDateShort(t.linha_base_inicio)} â†’ ${formatDateShort(t.linha_base_termino)}<br />
+                    ${t.evolucao_atual}% | Resp: ${escapeHtml(t.responsavel_atual || "-")}
+                  </div>
+                  <div class="kanban-actions">
+                    <span>#${t.id}</span>
+                    <button type="button" data-edit="${t.uid}">Editar</button>
+                  </div>
+                </div>
+              `)
+              .join("")}
+          </section>
+        `)
+        .join("")}
+      ${((byStatus[status] || new Map()).size === 0) ? '<p class="kanban-empty">Nenhuma tarefa nesta coluna.</p>' : ""}
+    </article>
+  `).join("");
+
+  wireKanbanEvents();
+}
+
+function wireKanbanEvents() {
+  document.querySelectorAll(".kanban-card").forEach((card) => {
+    card.addEventListener("dragstart", () => card.classList.add("dragging"));
+    card.addEventListener("dragend", () => card.classList.remove("dragging"));
+  });
+
+  document.querySelectorAll(".kanban-column").forEach((col) => {
+    col.addEventListener("dragover", (ev) => ev.preventDefault());
+    col.addEventListener("drop", (ev) => {
+      ev.preventDefault();
+      const dragging = document.querySelector(".kanban-card.dragging");
+      if (!dragging) return;
+      updateTaskStatus(Number(dragging.dataset.uid), col.dataset.status);
+    });
+  });
+
+  document.querySelectorAll("button[data-edit]").forEach((btn) => {
+    btn.addEventListener("click", () => openEditDialog(Number(btn.dataset.edit)));
+  });
+}
+
+function updateTaskFields(uid, updates) {
+  const key = String(uid);
+  const current = state.overrides[key] || {};
+  const next = { ...current, ...updates };
+  const currentTask = state.resolved.find((t) => t.uid === uid) || state.tarefas.find((t) => t.uid === uid);
+  const isMacroTask = Boolean(currentTask && currentTask.macro);
+
+  if (isMacroTask) {
+    delete next.evolucao_percentual_atual;
+    delete next.evolucao_ajustada_por_conclusao;
+    delete next.inicio_real;
+    delete next.termino_real;
+  }
+
+  if (updates.status_atual) {
+    next.status_atual = normalizeKanbanStatus(updates.status_atual);
+  }
+
+  const progressInputDefined = !isMacroTask && updates.evolucao_percentual_atual !== undefined;
+  const progressInputValue = progressInputDefined ? clampProgress(updates.evolucao_percentual_atual, 0) : null;
+  if (progressInputDefined && progressInputValue === 0) {
+    next.status_atual = "planejado";
+  }
+
+  const startedByProgress = !isMacroTask
+    && progressInputDefined
+    && progressInputValue > 0;
+  const startedByRealStart = !isMacroTask
+    && Object.prototype.hasOwnProperty.call(updates, "inicio_real")
+    && ![null, undefined, ""].includes(updates.inicio_real);
+  const startedSignal = startedByProgress || startedByRealStart;
+
+  if (
+    !isMacroTask
+    && startedSignal
+    && next.status_atual !== "concluÃ­da"
+    && next.status_atual !== "com pendencia"
+  ) {
+    next.status_atual = "em andamento";
+  }
+
+  if (!isMacroTask && next.status_atual === "concluÃ­da") {
+    next.evolucao_percentual_atual = 100;
+    next.evolucao_ajustada_por_conclusao = true;
+  } else if (!isMacroTask && updates.evolucao_percentual_atual !== undefined) {
+    next.evolucao_percentual_atual = clampProgress(updates.evolucao_percentual_atual, 0);
+    delete next.evolucao_ajustada_por_conclusao;
+  } else if (!isMacroTask && current.evolucao_ajustada_por_conclusao) {
+    delete next.evolucao_percentual_atual;
+    delete next.evolucao_ajustada_por_conclusao;
+  }
+  state.overrides[key] = next;
+  persistOverrides();
+  applyFilters();
+  enqueueProjectSync(uid, next);
+}
+
+function updateTaskStatus(uid, status) {
+  updateTaskFields(uid, { status_atual: status });
+}
+
+function openEditDialog(uid) {
+  const task = state.resolved.find((t) => t.uid === uid) || rollupMacroTasks(state.tarefas.map(applyOverrides)).find((t) => t.uid === uid);
+  if (!task) return;
+  state.currentEditUid = uid;
+  el.editTitle.textContent = `Atualizar tarefa #${task.id} - ${task.nome}`;
+  el.editStatus.value = task.kanban_status;
+  el.editOwner.value = task.responsavel_atual || "";
+  el.editProgress.value = String(task.evolucao_atual ?? 0);
+  el.editRealStart.value = task.inicio_real_atual || "";
+  el.editRealFinish.value = task.termino_real_atual || "";
+  el.baselineStartText.textContent = task.linha_base_inicio_texto || "ND";
+  el.baselineFinishText.textContent = task.linha_base_termino_texto || "ND";
+  el.editDialog.showModal();
+}
+
+function saveEdit(event) {
+  event.preventDefault();
+  const uid = state.currentEditUid;
+  if (!uid) return;
+  updateTaskFields(uid, {
+    status_atual: el.editStatus.value,
+    responsavel_atual: el.editOwner.value.trim(),
+    evolucao_percentual_atual: clampProgress(el.editProgress.value, 0),
+    inicio_real: el.editRealStart.value || null,
+    termino_real: el.editRealFinish.value || null,
+  });
+  el.editDialog.close();
+}
+
+function wireFilters() {
+  el.searchInput.addEventListener("input", applyFilters);
+  el.macroFilter.addEventListener("change", applyFilters);
+  el.ownerFilter.addEventListener("change", applyFilters);
+  el.baselineApplyButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    applyFilters();
+  });
+  el.baselineClearButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    el.baselineStartFromFilter.value = "";
+    el.baselineStartToFilter.value = "";
+    applyFilters();
+  });
+  el.resetButton.addEventListener("click", () => {
+    el.searchInput.value = "";
+    el.macroFilter.value = "";
+    el.ownerFilter.value = "";
+    el.baselineStartFromFilter.value = "";
+    el.baselineStartToFilter.value = "";
+    applyFilters();
+  });
+  el.editForm.addEventListener("submit", saveEdit);
+}
+
+function startAutoReloadForFileMode() {
+  if (window.location.protocol !== "file:") return;
+  setInterval(() => {
+    window.location.reload();
+  }, AUTO_RELOAD_MS);
+}
+
+async function init() {
+  let data = window.TASKS_DATA || null;
+  if (!data) {
+    const response = await fetch("./tasks.json");
+    data = await response.json();
+  }
+  state.tarefas = data.tarefas || [];
+  loadOverrides();
+  reconcileOverridesWithProjectData(data);
+  renderFilters();
+  wireFilters();
+  applyFilters();
+  startAutoReloadForFileMode();
+}
+
+init().catch((error) => {
+  document.body.innerHTML = `<main style="padding:24px"><h2>Falha ao carregar o dashboard</h2><pre>${escapeHtml(error.message)}</pre></main>`;
+});
+
+</script>
+</body>
+</html>
+
